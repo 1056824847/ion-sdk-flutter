@@ -13,7 +13,7 @@ class EchoTest extends StatefulWidget {
 class _EchoTestState extends State<EchoTest> {
   var localRenderer = RTCVideoRenderer();
   var remoteRenderer = RTCVideoRenderer();
-  final Connector _connector = Connector('http://127.0.0.1:5551');
+  final Connector _connector = Connector('http://192.168.68.113:50051');
   final _room = 'ion-simulcast';
   RemoteStream? _remoteStream;
   RTC? _sub;
@@ -40,7 +40,7 @@ class _EchoTestState extends State<EchoTest> {
     await rtc.join(_room, Uuid().v4(), JoinConfig());
 
     // publish LocalStream
-    var localStream = await LocalStream.getUserMedia(
+    var localStream = await LocalStream.getDisplayMedia(
         constraints: Constraints.defaults
           ..simulcast = true
           ..resolution = 'hd');

@@ -1,11 +1,32 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
+import 'package:get/get.dart';
 
 import 'views/echo_test.dart';
 import 'views/pub_sub.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  if(GetPlatform.isAndroid) {
+    startForegroundService();
+  }
+  runApp(MyApp());
+}
+
+Future<bool> startForegroundService() async {
+  final androidConfig = FlutterBackgroundAndroidConfig(
+    notificationTitle: 'Title of the notification',
+    notificationText: 'Text of the notification',
+    notificationImportance: AndroidNotificationImportance.Default,
+    notificationIcon: AndroidResource(
+        name: 'background_icon',
+        defType: 'drawable'), // Default is ic_launcher from folder mipmap
+  );
+  await FlutterBackground.initialize(androidConfig: androidConfig);
+  return FlutterBackground.enableBackgroundExecution();
+}
 
 class MyApp extends StatefulWidget {
   @override

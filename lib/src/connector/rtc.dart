@@ -399,5 +399,6 @@ class _IonSFUGRPCSignal extends Signal {
         ..streamId = stream.id);
     }
     _tracksInfos = trackInfos;
+    print(trackInfos);
   }
 }

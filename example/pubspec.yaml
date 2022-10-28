@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_icons: ^1.0.0
+  get: ^4.6.5
+  flutter_background: ^1.0.0
   flutter_ion:
     path: ../
 

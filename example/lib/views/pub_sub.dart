@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ion/flutter_ion.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
 class PubSub extends StatefulWidget {
@@ -11,7 +12,7 @@ class PubSub extends StatefulWidget {
 class _PubSubState extends State<PubSub> {
   final _localRenderer = RTCVideoRenderer();
   final List<RTCVideoRenderer> _remoteRenderers = <RTCVideoRenderer>[];
-  final Connector _connector = Connector('http://127.0.0.1:5551');
+  final Connector _connector = Connector('http://192.168.68.113:50051');
   final _room = 'ion';
   final _uid = Uuid().v4();
   late RTC _rtc;
@@ -55,8 +56,17 @@ class _PubSubState extends State<PubSub> {
 
     await _localRenderer.initialize();
     // publish LocalStream
+    DesktopCapturerSource? source = null;
+    if(GetPlatform.isDesktop) {
+      var sources = await desktopCapturer.getSources(types: [SourceType.Screen, SourceType.Window]);
+      sources.forEach((element) {
+        print(
+            'name: ${element.name}, id: ${element.id}, type: ${element.type}');
+      });
+      source = sources.firstWhereOrNull((element) => element.type == SourceType.Screen);
+    }
     var localStream =
-        await LocalStream.getUserMedia(constraints: Constraints.defaults);
+        await LocalStream.getDisplayMedia(desktopCapturerSource: source, constraints: Constraints.defaults);
     await _rtc.publish(localStream);
     setState(() {
       _localRenderer.srcObject = localStream.stream;
@@ -72,7 +82,7 @@ class _PubSubState extends State<PubSub> {
               title: Text('ion-sfu'),
             ),
             body: OrientationBuilder(builder: (context, orientation) {
-              return Column(
+              return ListView(
                 children: [
                   Row(
                     children: [Text('Local Video')],
@@ -80,20 +90,20 @@ class _PubSubState extends State<PubSub> {
                   Row(
                     children: [
                       SizedBox(
-                          width: 160,
-                          height: 120,
-                          child: RTCVideoView(_localRenderer, mirror: true))
+                          width: 160 * 1,
+                          height: 120 * 1,
+                          child: RTCVideoView(_localRenderer, mirror: false))
                     ],
                   ),
                   Row(
                     children: [Text('Remote Video')],
                   ),
-                  Row(
+                  Wrap(
                     children: [
                       ..._remoteRenderers.map((remoteRenderer) {
                         return SizedBox(
-                            width: 160,
-                            height: 120,
+                            width: Get.width,
+                            height: Get.height,
                             child: RTCVideoView(remoteRenderer));
                       }).toList(),
                     ],

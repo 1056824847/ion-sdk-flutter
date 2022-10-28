@@ -99,11 +99,10 @@ class Constraints {
   static final defaults = Constraints(
       resolution: 'hd',
       codec: 'vp8',
-      audio: true,
+      audio: false,
       video: true,
       simulcast: false);
 }
-
 class LocalStream {
   LocalStream(this._stream, this._constraints);
   final Constraints _constraints;
@@ -122,10 +121,22 @@ class LocalStream {
     return LocalStream(stream, constraints ?? Constraints.defaults);
   }
 
-  static Future<LocalStream> getDisplayMedia({Constraints? constraints}) async {
-    var stream = await navigator.mediaDevices.getDisplayMedia({
-      'video': true,
+  static Future<LocalStream> getDisplayMedia({Constraints? constraints,DesktopCapturerSource? desktopCapturerSource}) async {
+    var stream = await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
+      'audio': true,
+      'video': desktopCapturerSource == null && WebRTC.platformIsAndroid
+          ? true
+          : {
+        'frameRate': 17,
+        'deviceId': WebRTC.platformIsIOS ? 'broadcast' : {'exact': desktopCapturerSource!.id},
+        'mandatory': {
+          'minWidth': 1280,
+          'minHeight': 720,
+          'minFrameRate': 10
+        }
+      }
     });
+    print(stream.getVideoTracks().toString());
     return LocalStream(stream, Constraints.defaults);
   }
 
