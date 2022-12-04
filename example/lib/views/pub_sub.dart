@@ -12,7 +12,7 @@ class PubSub extends StatefulWidget {
 class _PubSubState extends State<PubSub> {
   final _localRenderer = RTCVideoRenderer();
   final List<RTCVideoRenderer> _remoteRenderers = <RTCVideoRenderer>[];
-  final Connector _connector = Connector('http://192.168.68.113:50051');
+  final Connector _connector = Connector('http://192.168.68.113:50551');
   final _room = 'ion';
   final _uid = Uuid().v4();
   late RTC _rtc;
@@ -52,7 +52,7 @@ class _PubSubState extends State<PubSub> {
     };
 
     await _rtc.connect();
-    await _rtc.join(_room, _uid, JoinConfig());
+    await _rtc.join('325', _uid, JoinConfig());
 
     await _localRenderer.initialize();
     // publish LocalStream
